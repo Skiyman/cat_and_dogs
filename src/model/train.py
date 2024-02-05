@@ -1,12 +1,10 @@
-import os
-
 import pandas as pd
 import torch
 from matplotlib import pyplot as plt
 from torch import nn
 from tqdm import tqdm
 
-from src.metrics.accuracy_metrics import calculate_accuracy
+from src.metrics.accuracy_metrics import calculate_accuracy, model_f1_score
 from src.metrics.metrics_monitor import MetricMonitor
 
 
@@ -22,7 +20,7 @@ class ModelTrainer(nn.Module):
         self.optimizer = optimizer
         self.epoch = epoch
 
-    def train_model(self):
+    def train_model(self, epoch):
         accuracy = None
         loss = None
 
@@ -31,7 +29,6 @@ class ModelTrainer(nn.Module):
         stream = tqdm(self.train_loader)
 
         for i, (images, target) in enumerate(stream, start=1):
-            os.system('clear')
             images = images.to(self.device, non_blocking=True)
             target = target.to(self.device, non_blocking=True)
             output = self.model(images)
@@ -44,7 +41,7 @@ class ModelTrainer(nn.Module):
             loss.backward()
             self.optimizer.step()
             stream.set_description(
-                "Epoch: {epoch}. Train.      {metric_monitor}".format(epoch=self, metric_monitor=metric_monitor)
+                "Epoch: {epoch}. Train.      {metric_monitor}".format(epoch=epoch, metric_monitor=metric_monitor)
             )
 
         self.model.eval()
@@ -57,11 +54,12 @@ class ModelTrainer(nn.Module):
                 output = self.model(images)
                 val_loss = self.criterion(output, target)
                 val_accuracy = calculate_accuracy(output, target)
-
+                f1 = model_f1_score(output, target)
+                metric_monitor.update("F1-score", f1)
                 metric_monitor.update("Loss", val_loss.item())
                 metric_monitor.update("Accuracy", val_accuracy)
                 stream.set_description(
-                    "Epoch: {epoch}. Validation. {metric_monitor}".format(epoch=self, metric_monitor=metric_monitor)
+                    "Validation. {metric_monitor}".format(metric_monitor=metric_monitor)
                 )
 
         self.history.loc[len(self.history.index)] = [self, loss.item(), round(accuracy.item() * 100, 2),
@@ -69,7 +67,9 @@ class ModelTrainer(nn.Module):
 
     def start_training(self):
         for epoch in range(1, self.epoch + 1):
-            self.train_model()
+            self.train_model(epoch)
+            torch.save(self.model.state_dict(), "model.pt")
+
 
     # функции для визуализации результатов
     # TODO: Надо эту функцию адаптировать под wandb

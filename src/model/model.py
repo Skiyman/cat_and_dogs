@@ -1,4 +1,3 @@
-# Модель нейронной сети
 from torch import nn
 
 

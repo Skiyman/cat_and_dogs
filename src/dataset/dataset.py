@@ -1,10 +1,10 @@
+import os
+
 import cv2
 import numpy as np
 import pandas as pd
 from PIL import Image
 from matplotlib import pyplot as plt
-from skimage.transform import resize
-from sklearn.model_selection import train_test_split
 from torch import nn
 
 
@@ -25,7 +25,7 @@ class Dataset(nn.Module):
         img = cv2.imread(img_path)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        label = img_path.split('/')[-1].split('.')[0]
+        label = img_path.split(os.sep)[-1].split('.')[0]
         if label == 'dog':
             label = 1
         elif label == 'cat':
