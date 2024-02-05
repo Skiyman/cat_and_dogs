@@ -1,4 +1,6 @@
 /venv
 /wandb
 /.idea
-/assets/kaggle
+/assets/kaggle/test1
+/assets/kaggle/train
+

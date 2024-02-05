@@ -31,8 +31,7 @@ class Dataset(nn.Module):
         elif label == 'cat':
             label = 0
 
-        if self.transform is not None:
-            img = self.transform(image=img)["image"]
+        img = self.transform(image=img)["image"]
 
         return img, label
 
