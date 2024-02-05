@@ -6,4 +6,7 @@
 git clone https://github.com/Skiyman/cat_and_dogs
 cd cat_and_dogs
 pip install -r requirements.txt
+mkdir assets/kaggle/
+cd assets/kaggle/
+kaggle datasets download -d kenroydytrim/dogsvscats
 ```
