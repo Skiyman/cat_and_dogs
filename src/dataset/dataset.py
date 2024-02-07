@@ -21,7 +21,6 @@ class Dataset(nn.Module):
     def __getitem__(self, idx):
         img_path = self.file_list[idx]
         img = Image.open(img_path)
-        # img_transformed = self.transform(img)
         img = cv2.imread(img_path)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 

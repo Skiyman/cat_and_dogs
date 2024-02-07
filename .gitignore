@@ -1,6 +1,12 @@
+/.venv
 /venv
 /wandb
 /.idea
 /assets/kaggle/test1
 /assets/kaggle/train
-
+/assets/train
+/assets/test1
+/.dist
+/src/dataset/__pycache__
+/src/metrics/__pycache__
+/src/model/__pycache__
