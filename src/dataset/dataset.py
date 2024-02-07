@@ -1,3 +1,4 @@
+# Нужные библиотеки
 import os
 
 import cv2
@@ -7,7 +8,7 @@ from PIL import Image
 from matplotlib import pyplot as plt
 from torch import nn
 
-
+# Преобразование данных в датасет для дальнейшего использования
 class Dataset(nn.Module):
     def __init__(self, file_list, transform, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -34,6 +35,7 @@ class Dataset(nn.Module):
 
         return img, label
 
+    # Визуализация данных
     def display_image_grid(self, predicted_labels=pd.DataFrame(), rows=2, cols=5):
         figure, ax = plt.subplots(nrows=rows, ncols=cols, figsize=(20, 12))
         random_idx = np.random.randint(1, len(self.file_list), size=10)
