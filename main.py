@@ -1,3 +1,4 @@
+# Нужные библиотеки
 import copy
 import os
 import random
@@ -27,7 +28,7 @@ LEARNING_RATE = 1e-3
 BATCH_SIZE = 64
 SEED = 42
 
-
+# Инициализируем seed
 def seed_everything(seed):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -37,7 +38,7 @@ def seed_everything(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = True
 
-
+# Функция для визуализации данных
 def display_image_grid(images_filepaths, predicted_labels=None, rows=2, cols=5, name=""):
     figure, ax = plt.subplots(nrows=rows, ncols=cols, figsize=(10, 6))
     random_idx = np.random.randint(1, len(images_filepaths), size=10)
@@ -60,7 +61,7 @@ def display_image_grid(images_filepaths, predicted_labels=None, rows=2, cols=5, 
     plt.tight_layout()
     plt.show()
 
-
+# Функция для визуализации аугментации
 def visualize_augmentations(dataset, idx=0, samples=10, cols=5):
     dataset = copy.deepcopy(dataset)
     dataset.transform = A.Compose([t for t in dataset.transform if not isinstance(t, (A.Normalize, ToTensorV2))])
@@ -76,7 +77,7 @@ def visualize_augmentations(dataset, idx=0, samples=10, cols=5):
     plt.tight_layout()
     plt.show()
 
-
+# Функция для вывода предсказаний
 def display_predict(model, test_loader, test_list, device):
     model = model.eval()
     predicted_labels = []
@@ -86,8 +87,6 @@ def display_predict(model, test_loader, test_list, device):
             output = model(data)
             predictions = F.softmax(output, dim=1)[:, 1].tolist()
             predicted_labels += list(zip(list(fileid), predictions))
-
-
 
 
     predicted_labels.sort(key=lambda x: int(x[0]))
@@ -111,8 +110,6 @@ def display_predict(model, test_loader, test_list, device):
         buff = int(input("Вывести пример работы модели (1-да, 0-нет): "))
 
 
-
-
 def main():
     # Инициализируем запуск wandb
     wandb.login()
@@ -125,11 +122,13 @@ def main():
 
     print("device: {0}".format(device))
 
+    # Загрузка датасета
     loader = DatasetLoader()
     loader.extract_dataset()
 
     seed_everything(SEED)
 
+    # Получение тренировочного, валидационного и тестового наборов данных
     train_list, val_list, test_list = loader.split_train(test_size=0.2, val_size=0.4)
     display_image_grid(train_list, name="Пример данных находящихся в датасете")
 
@@ -149,6 +148,7 @@ def main():
 
     print(model)
 
+    # Определение модели для тренировки
     trainer = ModelTrainer(
         device=device,
         train_loader=train_loader,
