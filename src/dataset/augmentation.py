@@ -1,7 +1,10 @@
+# Нужные библиотеки
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
+# Аугментация
 
+# Для train и test
 transform = A.Compose(
     [
         A.SmallestMaxSize(max_size=160), # Изменяем масштаб изображения так, чтобы минимальная сторона была равна max_size
@@ -15,6 +18,7 @@ transform = A.Compose(
     ])
 # Все это поможет увеличить объём данных
 
+# Для validation
 val_transforms = A.Compose(
     [
         A.SmallestMaxSize(max_size=160), # Изменяем масштаб изображения так, чтобы минимальная сторона была равна max_size
