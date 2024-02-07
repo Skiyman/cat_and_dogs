@@ -1,6 +1,7 @@
+# Нужные библиотеки
 from torch import nn
 
-
+# Модель нейронной сети CNN
 class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
@@ -26,7 +27,6 @@ class CNN(nn.Module):
             nn.MaxPool2d(2)
         )
 
-        # self.fc1 = nn.Lirear(3*3*64,10)
         self.fc1 = nn.Linear(64, 10)
         self.dropout = nn.Dropout(0.5)
         self.fc2 = nn.Linear(10, 2)
