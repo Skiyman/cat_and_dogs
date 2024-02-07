@@ -1,6 +1,5 @@
-import pandas as pd
 import torch
-from matplotlib import pyplot as plt
+import wandb
 from torch import nn
 from tqdm import tqdm
 
@@ -8,6 +7,7 @@ from src.metrics.accuracy_metrics import calculate_accuracy, model_f1_score
 from src.metrics.metrics_monitor import MetricMonitor
 
 
+# Класс для обучения
 class ModelTrainer(nn.Module):
     def __init__(self, device, train_loader, val_loader, model, criterion, optimizer, epoch, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -46,6 +46,10 @@ class ModelTrainer(nn.Module):
                 "Epoch: {epoch}.  Train.      {metric_monitor}".format(epoch=epoch, metric_monitor=metric_monitor)
             )
 
+        # Сохранение результатов
+        wandb.log({"accuracy": metric_monitor.metrics['Accuracy']['avg'],
+                   "loss": metric_monitor.metrics['Loss']['avg'],
+                   "F1-score": metric_monitor.metrics['F1-score']['avg']})
         val_accuracy = None
         val_loss = None
         val_f1 = None
@@ -67,23 +71,12 @@ class ModelTrainer(nn.Module):
                     "Epoch: {epoch}.  Validation. {metric_monitor}".format(epoch=epoch, metric_monitor=metric_monitor)
                 )
 
+        # Сохранение результатов
+        wandb.log({"val_accuracy": metric_monitor.metrics['Accuracy']['avg'],
+                   "val_loss": metric_monitor.metrics['Loss']['avg'],
+                   "val_F1-score": metric_monitor.metrics['F1-score']['avg']})
+
     def start_training(self):
         for epoch in range(1, self.epoch + 1):
             self.train_model(epoch)
             torch.save(self.model.state_dict(), "model.pt")
-
-
-    # функции для визуализации результатов
-    # TODO: Надо эту функцию адаптировать под wandb
-    def visualization(self):
-        columns = self.history.columns
-        size = columns.size
-        colors = ['red', 'orange', 'purple', 'green', 'blue']
-        f, axs = plt.subplots(1, size - 1, figsize=(20, 5))
-
-        for i in range(size - 1):
-            axs[i].plot(self.history.EPOCHS, self.history[columns[i + 1]],
-                        label=columns[i + 1], color=colors[i])
-            axs[i].set_xlabel('Эпоха обучения')
-            axs[i].set_ylabel(columns[i + 1])
-            axs[i].legend()

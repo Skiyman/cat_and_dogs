@@ -2,11 +2,14 @@ import copy
 import os
 import random
 
+import albumentations as A
 import cv2
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
+import wandb
+from albumentations.pytorch import ToTensorV2
 from matplotlib import pyplot as plt
 from torch import optim, nn
 from torch.utils.data import DataLoader
@@ -14,14 +17,12 @@ from torch.utils.data import DataLoader
 from src.dataset.augmentation import transform, val_transforms
 from src.dataset.dataset import Dataset
 from src.dataset.loader import DatasetLoader
+from src.metrics.wandb_metric import init_wandb
 from src.model.model import CNN
 from src.model.train import ModelTrainer
 
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
-
 # Параметры
-EPOCH = 10
+EPOCH = 15
 LEARNING_RATE = 1e-3
 BATCH_SIZE = 64
 SEED = 42
@@ -30,7 +31,7 @@ SEED = 42
 def seed_everything(seed):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
-    #np.random.seed(seed)
+    np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.backends.cudnn.deterministic = True
@@ -86,12 +87,16 @@ def display_predict(model, test_loader, test_list, device):
             predictions = F.softmax(output, dim=1)[:, 1].tolist()
             predicted_labels += list(zip(list(fileid), predictions))
 
+
+
+
     predicted_labels.sort(key=lambda x: int(x[0]))
     idx = list(map(lambda x: x[0], predicted_labels))
     prob = list(map(lambda x: x[1], predicted_labels))
     submission = pd.DataFrame({'id': idx, 'label': prob})
 
     preds = pd.DataFrame(columns=["id", "class"])
+
     for i in range(len(submission)):
         label = submission.label[i]
         if label > 0.5:
@@ -106,13 +111,23 @@ def display_predict(model, test_loader, test_list, device):
         buff = int(input("Вывести пример работы модели (1-да, 0-нет): "))
 
 
+
+
 def main():
+    # Инициализируем запуск wandb
+    wandb.login()
+    init_wandb(
+        learning_rate=LEARNING_RATE,
+        epochs=EPOCH,
+        batch_size=BATCH_SIZE
+    )
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     print("device: {0}".format(device))
 
     loader = DatasetLoader()
     loader.extract_dataset()
+
     seed_everything(SEED)
 
     train_list, val_list, test_list = loader.split_train(test_size=0.2, val_size=0.4)

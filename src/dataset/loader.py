@@ -12,7 +12,7 @@ class DatasetLoader:
         sep = os.sep
         self.dataset_archive_path = f"assets{sep}kaggle{sep}dogsvscats.zip"
         self.dataset_path = f"assets{sep}kaggle{sep}"
-        self.train_dir = f'assets{sep}train{sep}train'
+        self.train_dir = f'assets{sep}kaggle{sep}train{sep}train'
         #self.test_dir = f'assets{sep}test1{sep}test1'
 
         self.dataset_folder = os.listdir(self.dataset_path)
