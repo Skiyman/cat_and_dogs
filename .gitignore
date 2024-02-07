@@ -10,3 +10,4 @@
 /src/dataset/__pycache__
 /src/metrics/__pycache__
 /src/model/__pycache__
+/model.pt

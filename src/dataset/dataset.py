@@ -42,7 +42,7 @@ class Dataset(nn.Module):
         for idx in random_idx:
             image = cv2.imread(self.file_list[idx])
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            true_label = self.file_list[idx].split('/')[-1].split('.')[0]
+            true_label = self.file_list[idx].split(os.sep)[-1].split('.')[0]
             if predicted_labels.empty:
                 class_ = true_label
                 color = "green"
