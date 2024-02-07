@@ -1,10 +1,10 @@
-import os
-
 import cv2
 import numpy as np
 import pandas as pd
 from PIL import Image
 from matplotlib import pyplot as plt
+from skimage.transform import resize
+from sklearn.model_selection import train_test_split
 from torch import nn
 
 
@@ -21,10 +21,11 @@ class Dataset(nn.Module):
     def __getitem__(self, idx):
         img_path = self.file_list[idx]
         img = Image.open(img_path)
+        # img_transformed = self.transform(img)
         img = cv2.imread(img_path)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        label = img_path.split(os.sep)[-1].split('.')[0]
+        label = img_path.split('\\')[-1].split('.')[0]
         if label == 'dog':
             label = 1
         elif label == 'cat':
@@ -42,7 +43,7 @@ class Dataset(nn.Module):
         for idx in random_idx:
             image = cv2.imread(self.file_list[idx])
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            true_label = self.file_list[idx].split(os.sep)[-1].split('.')[0]
+            true_label = self.file_list[idx].split('/')[-1].split('.')[0]
             if predicted_labels.empty:
                 class_ = true_label
                 color = "green"
