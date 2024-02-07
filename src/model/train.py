@@ -74,6 +74,7 @@ class ModelTrainer(nn.Module):
                 val_accuracy = calculate_accuracy(output, target)
                 
                 f1 = model_f1_score(output, target)
+                conf_matrix = model_matrix(output, target)
                 
                 
                 metric_monitor.update("F1-score", f1)
@@ -96,17 +97,3 @@ class ModelTrainer(nn.Module):
         for epoch in range(1, self.epoch + 1):
             self.train_model()
 
-    # функции для визуализации результатов
-    # TODO: Надо эту функцию адаптировать под wandb
-    def visualization(self):
-        columns = self.history.columns
-        size = columns.size
-        colors = ['red', 'orange', 'purple', 'green', 'blue']
-        f, axs = plt.subplots(1, size - 1, figsize=(20, 5))
-
-        for i in range(size - 1):
-            axs[i].plot(self.history.EPOCHS, self.history[columns[i + 1]],
-                        label=columns[i + 1], color=colors[i])
-            axs[i].set_xlabel('Эпоха обучения')
-            axs[i].set_ylabel(columns[i + 1])
-            axs[i].legend()
